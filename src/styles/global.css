@@ -1,0 +1,351 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;600;700&family=Manrope:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Theme variables will be injected by ThemeContext */
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-background);
+  color: var(--color-on-surface);
+  overflow-x: hidden;
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+/* Sovereign Theme Specific Styles */
+body.theme-sovereign {
+  background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
+}
+
+body.theme-sovereign::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.015) 2px, rgba(0,0,0,0.015) 4px);
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.3;
+}
+
+/* Cyber Theme Specific Styles */
+body.theme-cyber {
+  background:
+    linear-gradient(180deg, #0a0a0a 0%, #000000 100%),
+    repeating-linear-gradient(0deg, transparent 0px, rgba(0, 255, 255, 0.03) 1px, transparent 2px),
+    repeating-linear-gradient(90deg, transparent 0px, rgba(255, 0, 255, 0.03) 1px, transparent 2px);
+  background-size: 100% 100%, 50px 50px, 50px 50px;
+  animation: cyber-grid 20s linear infinite;
+}
+
+@keyframes cyber-grid {
+  0% {
+    background-position: 0 0, 0 0, 0 0;
+  }
+  100% {
+    background-position: 0 0, 50px 50px, -50px -50px;
+  }
+}
+
+body.theme-cyber::after {
+  content: '';
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(0,255,255,0.1) 0%, transparent 70%);
+  animation: cyber-glow 8s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes cyber-glow {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.3;
+  }
+  100% {
+    transform: translate(20px, -20px) scale(1.1);
+    opacity: 0.5;
+  }
+}
+
+/* 3D Transform Utilities */
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.perspective {
+  perspective: 1000px;
+}
+
+.perspective-extreme {
+  perspective: 2000px;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+/* Glass Effect */
+.glass-effect {
+  background: var(--color-surface);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+}
+
+.theme-sovereign .glass-effect {
+  background: rgba(249, 249, 249, 0.7);
+  box-shadow: 0 8px 32px 0 rgba(44, 44, 44, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.theme-cyber .glass-effect {
+  background: rgba(10, 10, 10, 0.15);
+  box-shadow:
+    0 8px 32px 0 rgba(0, 255, 255, 0.1),
+    inset 0 0 20px rgba(0, 255, 255, 0.05);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+/* Glow Effects for Cyber Theme */
+.theme-cyber .glow-cyan {
+  box-shadow:
+    0 0 10px rgba(0, 255, 255, 0.3),
+    0 0 20px rgba(0, 255, 255, 0.2),
+    0 0 30px rgba(0, 255, 255, 0.1);
+}
+
+.theme-cyber .glow-magenta {
+  box-shadow:
+    0 0 10px rgba(255, 0, 255, 0.3),
+    0 0 20px rgba(255, 0, 255, 0.2),
+    0 0 30px rgba(255, 0, 255, 0.1);
+}
+
+.theme-cyber .text-glow-cyan {
+  text-shadow:
+    0 0 10px rgba(0, 255, 255, 0.5),
+    0 0 20px rgba(0, 255, 255, 0.3),
+    0 0 30px rgba(0, 255, 255, 0.2);
+}
+
+.theme-cyber .text-glow-magenta {
+  text-shadow:
+    0 0 10px rgba(255, 0, 255, 0.5),
+    0 0 20px rgba(255, 0, 255, 0.3),
+    0 0 30px rgba(255, 0, 255, 0.2);
+}
+
+/* 3D Card Animation */
+.card-3d {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transform-style: preserve-3d;
+}
+
+.card-3d:hover {
+  transform: translateY(-10px) rotateX(5deg);
+}
+
+.theme-sovereign .card-3d:hover {
+  box-shadow: 0 20px 60px rgba(44, 44, 44, 0.08);
+}
+
+.theme-cyber .card-3d:hover {
+  box-shadow:
+    0 20px 60px rgba(0, 255, 255, 0.2),
+    0 0 40px rgba(255, 0, 255, 0.1);
+}
+
+/* Button Styles */
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-container) 100%);
+  color: var(--color-on-primary);
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 0.25rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn-primary:hover::before {
+  left: 100%;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+}
+
+.theme-sovereign .btn-primary {
+  box-shadow: 0 4px 12px rgba(138, 72, 83, 0.2);
+}
+
+.theme-sovereign .btn-primary:hover {
+  box-shadow: 0 8px 20px rgba(138, 72, 83, 0.3);
+}
+
+.theme-cyber .btn-primary {
+  box-shadow:
+    0 4px 12px rgba(0, 255, 255, 0.3),
+    inset 0 0 20px rgba(0, 255, 255, 0.1);
+}
+
+.theme-cyber .btn-primary:hover {
+  box-shadow:
+    0 8px 20px rgba(0, 255, 255, 0.5),
+    0 0 40px rgba(0, 255, 255, 0.2),
+    inset 0 0 30px rgba(0, 255, 255, 0.15);
+}
+
+/* Scanline Effect for Cyber Theme */
+.theme-cyber .scanline {
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-cyber .scanline::after {
+  content: '';
+  position: absolute;
+  top: -100%;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  background: linear-gradient(to bottom, transparent, rgba(0, 255, 255, 0.3), transparent);
+  animation: scanline 4s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes scanline {
+  0% {
+    top: -10%;
+  }
+  100% {
+    top: 110%;
+  }
+}
+
+/* Floating Animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.float-animation {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* 3D Tilt on Hover */
+.tilt-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease;
+}
+
+.tilt-3d:hover {
+  transform: rotateX(10deg) rotateY(-10deg) scale(1.02);
+}
+
+/* Parallax Layers */
+.parallax-layer {
+  will-change: transform;
+}
+
+/* Content wrapper to sit above background effects */
+#root {
+  position: relative;
+  z-index: 10;
+}
+
+/* Smooth transitions for theme switching */
+* {
+  transition-property: background-color, color, border-color, box-shadow;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
+}
+
+/* Override for animations that shouldn't transition */
+.no-transition,
+.no-transition * {
+  transition: none !important;
+}
+
+/* Neon border effect for cyber theme */
+.theme-cyber .neon-border {
+  border: 2px solid var(--color-primary);
+  position: relative;
+}
+
+.theme-cyber .neon-border::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, var(--color-primary), var(--color-secondary));
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  filter: blur(10px);
+}
+
+.theme-cyber .neon-border:hover::before {
+  opacity: 0.7;
+}
+
+/* Holographic effect */
+.holographic {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  background-size: 200% 200%;
+  animation: holographic-shift 3s ease infinite;
+}
+
+@keyframes holographic-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
