@@ -1,0 +1,30 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isPlayerInGame(gameData) {
+      return isAuthenticated() && (request.auth.uid == gameData.players.RED || request.auth.uid == gameData.players.GREEN);
+    }
+
+    function isValidGame(data) {
+      return data.players is map &&
+             data.board is map &&
+             data.turn in ['RED', 'GREEN'] &&
+             data.status in ['waiting', 'active', 'finished'];
+    }
+
+    match /games/{gameId} {
+      allow read: if isAuthenticated();
+      
+      allow create: if isAuthenticated() && isValidGame(request.resource.data);
+      
+      allow update: if isAuthenticated() && 
+                    isValidGame(request.resource.data) &&
+                    (isPlayerInGame(resource.data) || resource.data.status == 'waiting');
+    }
+  }
+}

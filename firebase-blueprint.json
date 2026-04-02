@@ -1,0 +1,33 @@
+{
+  "entities": {
+    "Game": {
+      "title": "Game",
+      "description": "Represents a match between two players.",
+      "type": "object",
+      "properties": {
+        "players": {
+          "type": "object",
+          "properties": {
+            "RED": { "type": "string", "description": "UID of the red player" },
+            "GREEN": { "type": "string", "description": "UID of the green player" }
+          }
+        },
+        "board": { "type": "object", "description": "Current state of the board" },
+        "turn": { "type": "string", "enum": ["RED", "GREEN"] },
+        "winner": { "type": "string", "description": "Winner of the game" },
+        "lastMove": { "type": "object" },
+        "isCapturing": { "type": "boolean" },
+        "activePieceId": { "type": "number" },
+        "status": { "type": "string", "enum": ["waiting", "active", "finished"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["players", "board", "turn", "status"]
+    }
+  },
+  "firestore": {
+    "/games/{gameId}": {
+      "schema": "Game",
+      "description": "Collection of games"
+    }
+  }
+}
