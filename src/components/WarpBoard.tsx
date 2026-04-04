@@ -10,6 +10,7 @@ import { GameEngine } from '../game/GameEngine';
 import { generateBoardLayout, positionsEqual } from '../game/BoardLayout';
 import { createAIPlayer } from '../game/AIPlayer';
 import { useTheme } from '../contexts/ThemeContext';
+import { soundManager } from '../services/SoundManager';
 
 interface WarpBoardProps {
   gameState: GameState;
@@ -62,6 +63,8 @@ export const WarpBoard: React.FC<WarpBoardProps> = ({
     if (gameState.winner || piece.player !== gameState.turn) return;
     if (gameState.gameMode === 'solo' && gameState.turn === 'red') return;
 
+    soundManager.play('click');
+
     if (selectedPiece && positionsEqual(selectedPiece.position, piece.position)) {
       setSelectedPiece(null);
       setHighlightedMoves([]);
@@ -77,7 +80,27 @@ export const WarpBoard: React.FC<WarpBoardProps> = ({
 
     const move = highlightedMoves.find((m) => positionsEqual(m.to, position));
     if (move) {
+      // Play appropriate sound
+      if (move.isCapture) {
+        soundManager.play('capture');
+      } else {
+        soundManager.play('move');
+      }
+
       const newState = GameEngine.applyMove(gameState, move);
+
+      // Check if a piece was promoted to king
+      const movedPiece = newState.board[move.to.row][move.to.col];
+      const originalPiece = gameState.board[move.from.row][move.from.col];
+      if (movedPiece && originalPiece && movedPiece.type === 'king' && originalPiece.type === 'regular') {
+        soundManager.play('king');
+      }
+
+      // Check for winner
+      if (newState.winner) {
+        setTimeout(() => soundManager.play('win'), 300);
+      }
+
       onStateChange(newState);
       onMove(move);
       setSelectedPiece(null);

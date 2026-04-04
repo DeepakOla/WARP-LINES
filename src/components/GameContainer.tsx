@@ -6,11 +6,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { WarpBoard } from './WarpBoard';
+import { SettingsModal } from './SettingsModal';
 import type { GameState, GameMode, GameSettings, Move } from '../types/game';
 import { GameEngine } from '../game/GameEngine';
 import { CAMPAIGN_LEVELS, getStarsForMoves } from '../game/CampaignLevels';
 import { useTheme } from '../contexts/ThemeContext';
 import { Play, Users, Trophy, Settings, RotateCcw, Home } from 'lucide-react';
+import { soundManager } from '../services/SoundManager';
 
 type Screen = 'menu' | 'game' | 'settings' | 'campaign';
 
@@ -27,6 +29,7 @@ export const GameContainer: React.FC = () => {
   });
   const [campaignLevel, setCampaignLevel] = useState(1);
   const [completedLevels, setCompletedLevels] = useState<number[]>([]);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const startGame = (mode: GameMode, customSettings?: GameSettings) => {
     const gameSettings = customSettings || settings;
@@ -85,7 +88,10 @@ export const GameContainer: React.FC = () => {
   }> = ({ icon, title, description, onClick }) => (
     <motion.button
       className="glass-effect p-6 rounded-xl text-left w-full"
-      onClick={onClick}
+      onClick={() => {
+        soundManager.play('click');
+        onClick();
+      }}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       style={{
@@ -125,9 +131,18 @@ export const GameContainer: React.FC = () => {
             exit={{ opacity: 0, y: -20 }}
           >
             <div className="text-center mb-8">
-              <h1 className="text-5xl font-bold mb-2" style={{ fontFamily: theme.fonts.display }}>
-                WARP BOARD
-              </h1>
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-10" /> {/* Spacer for centering */}
+                <h1 className="text-5xl font-bold flex-1" style={{ fontFamily: theme.fonts.display }}>
+                  WARP BOARD
+                </h1>
+                <button
+                  onClick={() => setIsSettingsOpen(true)}
+                  className="glass-effect p-3 rounded-lg"
+                >
+                  <Settings size={20} />
+                </button>
+              </div>
               <p className="text-sm opacity-70">
                 A strategic board game of captures and tactics
               </p>
@@ -376,6 +391,9 @@ export const GameContainer: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Settings Modal */}
+      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );
 };
