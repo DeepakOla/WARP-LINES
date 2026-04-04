@@ -90,7 +90,7 @@ export const ThemeSwitcher: React.FC = () => {
                           : themeOption.preview.surface === '#f9f9f9'
                           ? 'rgba(255, 255, 255, 0.5)'
                           : 'rgba(0, 0, 0, 0.3)',
-                        ringColor: isActive ? themeOption.preview.primary : 'transparent',
+                        // ringColor: isActive ? themeOption.preview.primary : 'transparent',
                       }}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
