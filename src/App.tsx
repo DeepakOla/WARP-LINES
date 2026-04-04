@@ -1,7 +1,7 @@
 import React from 'react';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ThemeSwitcher } from './components/ThemeSwitcher';
-import { GameBoard } from './components/GameBoard';
+import { GameContainer } from './components/GameContainer';
 import './styles/global.css';
 
 const App: React.FC = () => {
@@ -9,7 +9,7 @@ const App: React.FC = () => {
     <ThemeProvider>
       <div className="min-h-screen">
         <ThemeSwitcher />
-        <GameBoard />
+        <GameContainer />
       </div>
     </ThemeProvider>
   );
