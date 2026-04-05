@@ -26,7 +26,7 @@ export const GameBoard: React.FC = () => {
 
   if (!gameState) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: theme.colors.background }}>
-      <p style={{ color: theme.colors.onSurface, fontFamily: theme.fonts.body, opacity: 0.5 }}>Loading game2026</p>
+      <p style={{ color: theme.colors.onSurface, fontFamily: theme.fonts.body, opacity: 0.5 }}>Loading game…</p>
     </div>
   );
 

@@ -166,7 +166,7 @@ export function generateCampaignLevel(levelId: number): CampaignLevel {
   const aiDifficulty: AIDifficulty = 5;
   const extraDepth = Math.floor((levelId - 11) / 5);
   const timeLimit = levelId % 3 === 0 ? Math.max(20, 30 - extraDepth * 2) : null;
-  const infiltrators = Math.min(2, Math.floor((levelId - 11) / 4)) as 0 | 1 | 2;
+  const infiltrators = Math.max(0, Math.min(2, Math.floor((levelId - 11) / 4))) as 0 | 1 | 2;
 
   const baseStars: [number, number, number] = [
     Math.max(8, 15 - extraDepth),

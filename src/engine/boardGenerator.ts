@@ -189,7 +189,8 @@ export function createInitialPieces(config: BoardConfig): Piece[] {
  */
 export function getBoardSVGSize(config: BoardConfig): { width: number; height: number } {
   const maxRowSize = Math.max(...config.rows);
-  const width = SVG_PADDING * 2 + (maxRowSize - 1 + 1) * NODE_SPACING_X; // +1 for 0.5 offset
+  // maxRowSize * NODE_SPACING_X covers all nodes including the 0.5-column offset used by even rows
+  const width = SVG_PADDING * 2 + maxRowSize * NODE_SPACING_X;
   const height = SVG_PADDING * 2 + (config.rows.length - 1) * ROW_HEIGHT;
   return { width, height };
 }

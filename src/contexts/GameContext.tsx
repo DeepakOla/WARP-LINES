@@ -203,7 +203,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => worker.terminate();
   }, [applyAIMove]);
 
-  // Trigger AI when it's the AI's turn
+  // Trigger AI when it's the AI's turn.
+  // Depend on the full gameState so that a new game starting on player2's turn
+  // (or any currentPlayer/status change) reliably triggers the AI.
   useEffect(() => {
     const gs = state.gameState;
     if (!gs || gs.status !== 'PLAYING') return;
@@ -219,7 +221,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       state: serialized,
       difficulty: gs.aiDifficulty ?? 3,
     });
-  }, [state.gameState?.currentPlayer, state.gameState?.status]);
+  }, [state.gameState, state.isAIThinking]);
 
   const handleCampaignCompletion = useCallback(
     (gs: GameState, winner: string | null) => {
