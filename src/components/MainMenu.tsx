@@ -1,15 +1,29 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { GameMode } from '../types/game';
+import { GameMode, AILevel } from '../types/game';
 import { useTheme } from '../contexts/ThemeContext';
 
 interface MainMenuProps {
-  onModeSelect: (mode: GameMode) => void;
+  onModeSelect: (mode: GameMode, aiDifficulty?: AILevel) => void;
 }
 
 export const MainMenu: React.FC<MainMenuProps> = ({ onModeSelect }) => {
   const { theme, themeType } = useTheme();
   const [hoveredMode, setHoveredMode] = useState<GameMode | null>(null);
+  const [showDifficultySelect, setShowDifficultySelect] = useState(false);
+  const [selectedDifficulty, setSelectedDifficulty] = useState<AILevel>('medium');
+
+  const difficulties: Array<{
+    level: AILevel;
+    name: string;
+    description: string;
+  }> = [
+    { level: 'novice', name: 'Novice', description: 'Learning the game' },
+    { level: 'easy', name: 'Easy', description: 'Casual player' },
+    { level: 'medium', name: 'Medium', description: 'Balanced challenge' },
+    { level: 'hard', name: 'Hard', description: 'Experienced player' },
+    { level: 'master', name: 'Master', description: 'Expert strategist' },
+  ];
 
   const modes: Array<{
     mode: GameMode;
@@ -30,7 +44,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({ onModeSelect }) => {
       title: 'SOLO',
       description: 'Challenge the AI with 5 difficulty levels',
       icon: '🤖',
-      available: false, // Phase 3
+      available: true, // Phase 3 - NOW AVAILABLE
     },
     {
       mode: 'campaign',
@@ -104,7 +118,14 @@ export const MainMenu: React.FC<MainMenuProps> = ({ onModeSelect }) => {
                     opacity: modeItem.available ? 1 : 0.5,
                     cursor: modeItem.available ? 'pointer' : 'not-allowed',
                   }}
-                  onClick={() => modeItem.available && onModeSelect(modeItem.mode)}
+                  onClick={() => {
+                    if (!modeItem.available) return;
+                    if (modeItem.mode === 'solo') {
+                      setShowDifficultySelect(true);
+                    } else {
+                      onModeSelect(modeItem.mode);
+                    }
+                  }}
                   onMouseEnter={() => modeItem.available && setHoveredMode(modeItem.mode)}
                   onMouseLeave={() => setHoveredMode(null)}
                   disabled={!modeItem.available}
@@ -182,6 +203,107 @@ export const MainMenu: React.FC<MainMenuProps> = ({ onModeSelect }) => {
           More game modes coming in future phases
         </motion.div>
       </div>
+
+      {/* Difficulty Selection Modal */}
+      {showDifficultySelect && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            className="fixed inset-0 z-50"
+            style={{
+              background: 'rgba(0, 0, 0, 0.7)',
+              backdropFilter: 'blur(10px)',
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            onClick={() => setShowDifficultySelect(false)}
+          />
+
+          {/* Modal */}
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: 'spring', damping: 20 }}
+          >
+            <div
+              className="glass-effect rounded-2xl p-8 max-w-md w-full shadow-2xl"
+              style={{
+                border: themeType === 'cyber'
+                  ? '2px solid #00ffff'
+                  : '1px solid rgba(128, 128, 128, 0.2)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2
+                className="text-2xl font-bold mb-6 text-center"
+                style={{ color: theme.colors.primary }}
+              >
+                Select AI Difficulty
+              </h2>
+
+              <div className="space-y-3">
+                {difficulties.map((diff, index) => (
+                  <motion.button
+                    key={diff.level}
+                    className="w-full p-4 rounded-lg transition-all duration-200"
+                    style={{
+                      background: selectedDifficulty === diff.level
+                        ? themeType === 'cyber'
+                          ? 'rgba(0, 255, 255, 0.2)'
+                          : 'rgba(138, 72, 83, 0.2)'
+                        : 'rgba(128, 128, 128, 0.1)',
+                      border: selectedDifficulty === diff.level
+                        ? themeType === 'cyber'
+                          ? '2px solid #00ffff'
+                          : '2px solid #8a4853'
+                        : '1px solid rgba(128, 128, 128, 0.2)',
+                    }}
+                    onClick={() => setSelectedDifficulty(diff.level)}
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: index * 0.05 }}
+                  >
+                    <div className="text-left">
+                      <div className="font-bold text-lg">{diff.name}</div>
+                      <div className="text-sm opacity-70">{diff.description}</div>
+                    </div>
+                  </motion.button>
+                ))}
+              </div>
+
+              <div className="flex gap-4 mt-6">
+                <button
+                  className="flex-1 px-6 py-3 rounded-lg font-semibold transition-all duration-200"
+                  style={{
+                    background: themeType === 'cyber'
+                      ? 'linear-gradient(145deg, #00ffff, #00cccc)'
+                      : 'linear-gradient(145deg, #8a4853, #a6606b)',
+                    color: themeType === 'cyber' ? '#000' : '#fff',
+                  }}
+                  onClick={() => {
+                    onModeSelect('solo', selectedDifficulty);
+                    setShowDifficultySelect(false);
+                  }}
+                >
+                  Start Game
+                </button>
+
+                <button
+                  className="flex-1 px-6 py-3 rounded-lg font-semibold transition-all duration-200"
+                  style={{
+                    background: 'rgba(128, 128, 128, 0.2)',
+                    border: '1px solid rgba(128, 128, 128, 0.3)',
+                  }}
+                  onClick={() => setShowDifficultySelect(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </>
+      )}
     </div>
   );
 };

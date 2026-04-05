@@ -221,7 +221,7 @@ export function undoMove(gameState: GameState): GameState | null {
 /**
  * Clone game state (deep copy)
  */
-function cloneGameState(gameState: GameState): GameState {
+export function cloneGameState(gameState: GameState): GameState {
   return {
     ...gameState,
     players: gameState.players.map((p) => ({ ...p, pieces: [...p.pieces] })),
