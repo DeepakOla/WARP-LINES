@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useGame } from '../contexts/GameContext';
 import { motion } from 'motion/react';
-import { Position, GameMode } from '../types/game';
+import { Position, GameMode, AILevel } from '../types/game';
 import { GeometricGrid } from './GeometricGrid';
 import { ScorePanel } from './ScorePanel';
 import { GameControls } from './GameControls';
@@ -49,8 +49,8 @@ export const GameBoard: React.FC = () => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  const handleModeSelect = (mode: GameMode) => {
-    createNewGame(mode);
+  const handleModeSelect = (mode: GameMode, aiDifficulty?: AILevel) => {
+    createNewGame(mode, undefined, aiDifficulty);
     setShowMainMenu(false);
   };
 
@@ -96,7 +96,8 @@ export const GameBoard: React.FC = () => {
 
   const handlePlayAgain = () => {
     if (gameState) {
-      createNewGame(gameState.mode, gameState.rules);
+      const aiDifficulty = gameState.players[1].aiDifficulty;
+      createNewGame(gameState.mode, gameState.rules, aiDifficulty);
     }
   };
 

@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
-import { GameState, Position, GameMode, GameRules } from '../types/game';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+import { GameState, Position, GameMode, GameRules, AILevel } from '../types/game';
 import {
   createGameState,
   startGame,
@@ -14,15 +14,17 @@ import {
 } from '../engine/gameState';
 import { checkWinCondition } from '../engine/winCondition';
 import { DEFAULT_RULES } from '../config/gameConfig';
+import { createAIPlayer } from '../engine/aiEngine';
 
 interface GameContextType {
   gameState: GameState | null;
   selectedPiece: Position | null;
   availableMoves: Position[];
   isGameActive: boolean;
+  isAIThinking: boolean;
 
   // Game actions
-  createNewGame: (mode: GameMode, rules?: GameRules) => void;
+  createNewGame: (mode: GameMode, rules?: GameRules, aiDifficulty?: AILevel) => void;
   startCurrentGame: () => void;
   makeMove: (from: Position, to: Position) => boolean;
   selectPiece: (position: Position | null) => void;
@@ -42,9 +44,20 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [selectedPiece, setSelectedPiece] = useState<Position | null>(null);
   const [availableMoves, setAvailableMoves] = useState<Position[]>([]);
+  const [isAIThinking, setIsAIThinking] = useState(false);
+  const aiPlayerRef = useRef<ReturnType<typeof createAIPlayer> | null>(null);
 
-  const createNewGame = useCallback((mode: GameMode, rules: GameRules = DEFAULT_RULES) => {
+  const createNewGame = useCallback((mode: GameMode, rules: GameRules = DEFAULT_RULES, aiDifficulty: AILevel = 'medium') => {
     const newGame = createGameState(mode, rules);
+
+    // Update AI difficulty if in solo mode
+    if (mode === 'solo') {
+      newGame.players[1].aiDifficulty = aiDifficulty;
+      aiPlayerRef.current = createAIPlayer(aiDifficulty);
+    } else {
+      aiPlayerRef.current = null;
+    }
+
     setGameState(newGame);
     setSelectedPiece(null);
     setAvailableMoves([]);
@@ -81,6 +94,48 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     return false;
   }, [gameState]);
+
+  // AI move execution
+  useEffect(() => {
+    if (!gameState || gameState.status !== 'playing') return;
+    if (isAIThinking) return;
+
+    const currentPlayer = getCurrentPlayer(gameState);
+
+    // Check if it's AI's turn
+    if (currentPlayer.isAI && aiPlayerRef.current) {
+      setIsAIThinking(true);
+
+      // Execute AI move after a brief delay
+      aiPlayerRef.current.findBestMove(gameState)
+        .then((aiMove) => {
+          // Execute the AI's move
+          const result = executeMove(gameState, aiMove.move.from, aiMove.move.to);
+
+          if (result.success) {
+            setGameState(result.newState);
+            setSelectedPiece(null);
+            setAvailableMoves([]);
+
+            // Check for win condition
+            const winCondition = checkWinCondition(result.newState);
+            if (winCondition.hasWinner || winCondition.isDraw) {
+              const finalState = endGame(
+                result.newState,
+                winCondition.isDraw ? 'draw' : winCondition.winner === 'player1' ? 'player1-win' : 'player2-win'
+              );
+              setGameState(finalState);
+            }
+          }
+
+          setIsAIThinking(false);
+        })
+        .catch((error) => {
+          console.error('AI move error:', error);
+          setIsAIThinking(false);
+        });
+    }
+  }, [gameState, isAIThinking]);
 
   const selectPiece = useCallback((position: Position | null) => {
     setSelectedPiece(position);
@@ -146,6 +201,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     selectedPiece,
     availableMoves,
     isGameActive,
+    isAIThinking,
     createNewGame,
     startCurrentGame,
     makeMove,
